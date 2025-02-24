@@ -90,7 +90,7 @@ class NurikabeHillClimbing:
     # Lấy ra vùng đảo sai kích thước được quy định trong ô đánh số
     # Trả về một list chứa tọa độ các ô đảo sai kích thước   
     def get_false_size_island(self, state):
-        visited = np.zeros((self.rows, self.cols), dtype=bool)
+        global_visited = np.zeros((self.rows, self.cols), dtype=bool)
         false_island_regions = []
         
         # lấy ra các ô được đánh số cho đảo
@@ -105,12 +105,28 @@ class NurikabeHillClimbing:
         # sau đó kiểm tra xem trong vùng đảo hiện tại có đảo không đảm bảo kích thước không
         # điều kiện đảo không đảm bảo kích thước là vượt qua / không bằng số ô được quy định trong ô đánh số
         for (i, j) in numbered_cells:
+            visited = np.zeros((self.rows, self.cols), dtype=bool)  
             if state[i,j] == 'L' and visited[i,j] == False:
                 island_size = self.dfs(i, j, state, visited, 'L')
                 target_size = int(self.grid[i,j])
                 if island_size != target_size:
                     false_island_regions.append((i,j))
-                    return false_island_regions
+            
+            # đánh dấu các ô đảo chứa ô được đánh số đã đi qua
+            for i in range(self.rows):
+                for j in range(self.cols):
+                    global_visited[i,j] = visited[i,j]
+        
+        # duyệt qua các đảo không được đánh số
+        # đây có thể là các đảo bị đánh ngẫu nhiên mà không chứa ô đánh số 
+        # nếu có trường hợp này thì phải lập tức xóa đảo này đi
+        # chuyển từ L ---> W
+        # for i in range(self.rows):
+        #     for j in range(self.cols):
+        #         if state[i,j] == 'L' and global_visited[i,j] == False and (i,j) not in numbered_cells:
+        #             global_visited[i,j] = True
+        #             state[i,j] = 'W'
+
         
         return false_island_regions
 
@@ -134,7 +150,7 @@ class NurikabeHillClimbing:
                     return [(i,j), (i,j+1), (i+1,j), (i+1,j+1)]
         return []
 
-    def get_neighbor(self):
+    def get_best_neighbor(self):
         new_state = self.current_state.copy()
         is_new_state_valid = False
         
@@ -151,9 +167,9 @@ class NurikabeHillClimbing:
             return new_state
             
         error_cells = []
-        error_cells += self.get_error_2x2_water_cells(new_state)
-        error_cells += self  .get_error_isolated_water_regions(new_state)
         error_cells += self.get_false_size_island(new_state)
+        error_cells += self  .get_error_isolated_water_regions(new_state)
+        error_cells += self.get_error_2x2_water_cells(new_state)
         # print(f'Error cells: {error_cells}')
         
         # Thực hiện thay đổi ngẫu nhiên trên các ô có thể thay đổi và là ô bị lỗi
@@ -173,11 +189,10 @@ class NurikabeHillClimbing:
             # chọn ngẫu nhiên hướng đi liền kề là đảo và thay đổi ô đó thành nước để điều chỉnh size
             else:
 
-                # lấy ngẫu nhiên ô liền kề theo 4 hướng
+                # đi lần lượt qua ô liền kề theo 4 hướng
                 # nếu ô liền kề là đảo thì chọn ô đó để đi
-                for x in range(3):
-                    secure_random = random.SystemRandom()
-                    dr, dc = secure_random.choice(self.directions)
+                # kiểm tra xem có phải là láng giềng tốt nhất không
+                for dr, dc in self.directions:
                     new_row, new_col = error_cell[0] + dr, error_cell[1] + dc
                     if self.is_valid_cell(new_row, new_col) and not str(self.grid[new_row, new_col]).isdigit() and new_state[new_row, new_col] == 'L':
                         temp_state = new_state.copy()
@@ -207,7 +222,7 @@ class NurikabeHillClimbing:
             if self.current_score == 0:
                 return self.current_state
 
-            neighbor = self.get_neighbor()
+            neighbor = self.get_best_neighbor()
             neighbor_score = self.evaluate_state(neighbor)
 
             if neighbor_score < self.current_score:
