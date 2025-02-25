@@ -45,3 +45,7 @@ def possible_candidates(board, row, col):
 def zero_number(board):
     """Số các ô trống chưa điền"""
     return sum(cell == 0 for row in board for cell in row)
+
+def is_right_number(board, row, col, num, goal_board):
+    """Kiểm tra xem đáp án đúng với kết quả không"""
+    return is_valid(board, row, col, num) and num == goal_board[row][col]
