@@ -1,10 +1,10 @@
 # gui.py 
 # Tạo game sudoku với ma trận 9x9
 
-import pygame
-import sys
+import pygame, sys, time
 import copy
 import heapq
+import tracemalloc
 # Lấy để giải ra goal_board
 from solve_astar import solve_astar, board_to_tuple
 from solve_dfs import solve_dfs
@@ -79,6 +79,7 @@ initial_board = copy.deepcopy(sudoku_board)
 goal_board = copy.deepcopy(sudoku_board)
 selected_cell = None         # (row, col) của ô được chọn
 number_marks = {}            # Dictionary lưu candidate: key=(row,col), value=số người chơi nhập (chưa confirm)
+
 
 # Set fps cho game
 clock = pygame.time.Clock()
@@ -160,7 +161,8 @@ def solve_dfs_visual(initial_board):
         return True  # Không còn ô trống => đã giải được
 
     row, col = empty_cell
-
+    
+    pygame.event.pump()
     for num in range(1, 10):
         if is_valid(initial_board, row, col, num):
             initial_board[row][col] = num
@@ -169,7 +171,7 @@ def solve_dfs_visual(initial_board):
             draw_board(initial_board)
             highlight_selected((row, col))
             pygame.display.update()
-            pygame.time.delay(20)
+            pygame.time.delay(2)
             
             # backtracking
             if solve_dfs_visual(initial_board):
@@ -191,6 +193,7 @@ def solve_astar_visual(initial_board):
     openSet = [(fScore[initial_tuple], gScore[initial_tuple], initial)]
     closeSet = set()
 
+    pygame.event.pump()
     while openSet:
         _, current_g, current_state = heapq.heappop(openSet)
         current_tuple = board_to_tuple(current_state)
@@ -215,7 +218,7 @@ def solve_astar_visual(initial_board):
                 draw_board(new_state)
                 highlight_selected((row, col))
                 pygame.display.update()
-                pygame.time.delay(40)
+                pygame.time.delay(20)
                 new_tuple = board_to_tuple(new_state)
 
                 tentative_g = current_g + 1 # mỗi bước +1
@@ -331,13 +334,28 @@ def main():
                                         total_error = total_error + 1
                     # Nhấn A, gọi solver để hiển thị giải pháp solve_astar
                     if event.key == pygame.K_a:
+                        # In ra thời gian chạy của giải thuật
+                        start_time = time.time()
+                        # Theo dõi tốn bao nhiêu bộ nhớ
+                        tracemalloc.start()
                         if solve_astar_visual(sudoku_board):
                             solved = True
+                        print("Running time: " + str(time.time() - start_time))
+                        current, peak = tracemalloc.get_traced_memory()
+                        print(f"Current memory usage: {current / 1024:.2f} KB; Peak: {peak / 1024:.2f} KB")
+
 
                     # Nhấn D, gọi solver để hiển thị giải pháp solve_dfs
                     if event.key == pygame.K_d:
+                        # In ra thời gian chạy của giải thuật
+                        start_time = time.time()
+                        # Theo dõi tốn bao nhiêu bộ nhớ
+                        tracemalloc.start()
                         if solve_dfs_visual(sudoku_board):
                             solved = True
+                        print("Running time: " + str(time.time() - start_time))
+                        current, peak = tracemalloc.get_traced_memory()
+                        print(f"Current memory usage: {current / 1024:.2f} KB; Peak: {peak / 1024:.2f} KB")
 
         pygame.display.flip()
         clock.tick(60)
