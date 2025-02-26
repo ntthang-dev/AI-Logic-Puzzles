@@ -44,7 +44,7 @@ def solve_astar(initial_board):
 
                 tentative_g = current_g + 1 # mỗi bước +1
                 # Nếu tuple là trường hợp trùng và tốn nhiều bước hơn thì bỏ qua
-                if new_tuple in gScore and tentative_g >= gScore[new_state]:
+                if new_tuple in gScore and tentative_g >= gScore[new_tuple]:
                     continue
                 
                 # Cập nhật trạng thái hiện tại và đi tiếp
