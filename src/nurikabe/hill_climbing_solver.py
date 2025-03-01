@@ -1,5 +1,8 @@
 import numpy as np
 import random
+import time
+import psutil
+import os
 
 class NurikabeHillClimbing:
     def __init__(self, initial_grid, max_iterations=10000):
@@ -214,12 +217,36 @@ class NurikabeHillClimbing:
         return new_state
 
     def solve(self):
-        print(f"Initial state:")
-        print(self.current_score)
-        print(self.current_state)
+        start_time = time.perf_counter()
+        process = psutil.Process(os.getpid())  # Lấy thông tin tiến trình hiện tại
+        start_memory = process.memory_info().rss / 1024 / 1024  # Bộ nhớ ban đầu (MB)
+        start_cpu = process.cpu_percent(interval=None)  # CPU ban đầu
+        
+        print(f"=============================================")
+        print("Solving using Hill Climbing...")
+        print(f"Max iterations: {self.max_iterations}")
+        print(f"Start time: {start_time}")
+        print(f"Start memory: {start_memory} MB")
+        print(f"Start CPU: {start_cpu}%")
+        print(f"Current process: {process}")
+        print(f"Initial score: {self.current_score}")
+        print(f"Initial state: \n{self.current_state}")
+
 
         for x in range(self.max_iterations):
             if self.current_score == 0:
+                end_time = time.perf_counter()
+                end_memory = process.memory_info().rss / 1024 / 1024  # Bộ nhớ cuối (MB)
+                end_cpu = process.cpu_percent(interval=None)  # CPU cuối
+
+                print(f"End time: {end_time}")
+                print(f"Processing time: {end_time - start_time:.4f} seconds")
+                print(f"Used memory: {end_memory - start_memory:.2f} MB")
+                print(f"Average CPU usage: {end_cpu:.2f}%")
+                
+                print("\nSolution found:")
+                print(self.current_state)
+
                 return self.current_state
 
             neighbor = self.get_best_neighbor()
@@ -230,6 +257,17 @@ class NurikabeHillClimbing:
                 self.current_score = neighbor_score
                 print(f"Improved score: {self.current_score}")  # Thêm log để theo dõi
                 print(self.current_state) # Thêm log để theo dõi
+
+        end_time = time.perf_counter()
+        end_memory = process.memory_info().rss / 1024 / 1024  # Bộ nhớ cuối (MB)
+        end_cpu = process.cpu_percent(interval=None)  # CPU cuối
+
+        print(f"End time: {end_time}")
+        print(f"Processing time: {end_time - start_time:.4f} seconds")
+        print(f"Used memory: {end_memory - start_memory:.2f} MB")
+        print(f"Average CPU usage: {end_cpu:.2f}%")
+        
+        print("\nNo exactly solution found in given iterations")
 
         return None
 
@@ -250,4 +288,4 @@ if __name__ == "__main__":
         print("\nSolution found:")
         print(solution)
     else:
-        print("\nNo solution found in given iterations")
+        print("\nNo exactly solution found in given iterations")
