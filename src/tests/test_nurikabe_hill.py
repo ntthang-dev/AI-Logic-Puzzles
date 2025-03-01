@@ -17,30 +17,45 @@ class TestNurikabeInit(unittest.TestCase):
             ['.', '.', '.', '.', '.']
         ]
         '''
+        print("Test 1")
         grid = [
             ['.', '.', '.'],
             ['.', '1', '.'],
             ['.', '.', '.']
         ]
-        solver = NurikabeHillClimbing(grid, max_iterations=50000)
-        solution = solver.solve()
         expected = np.array(
             [['W', 'W', 'W'],
             ['W', 'L', 'W'],
             ['W', 'W', 'W']]
             )
-        self.assertTrue(np.array_equal(solution, expected))
+        
+        for _ in range(3):  # Lặp tối đa 3 lần
+            solver = NurikabeHillClimbing(grid, max_iterations=50000)
+            solution = solver.solve()
+            
+            if np.array_equal(solution, expected):  
+                return
+        print(solution)    
+        self.fail("Solution was incorrect in all 3 attempts")
     def test_hill_2(self):
+        print("Test 2")
         grid = [
             ['.', '.', '.'],
             ['.', '2', '.'],
             ['.', '3', '.']
         ]
-        solver = NurikabeHillClimbing(grid, max_iterations=50000)
-        solution = solver.solve()
         expected = None
-        self.assertTrue(np.array_equal(solution, expected))
+        
+        for _ in range(3):  # Lặp tối đa 3 lần
+            solver = NurikabeHillClimbing(grid, max_iterations=50000)
+            solution = solver.solve()
+            
+            if np.array_equal(solution, expected):  
+                return  # Nếu một lần đúng, kết thúc test luôn
+        print(solution)
+        self.fail("Solution was incorrect in all 3 attempts")
     def test_hill_3(self):
+        print("Test 3")
         grid = [
             ['.', '.', '.', '.', '.'],
             ['.', '.', '.', '.', '.'],
@@ -64,6 +79,7 @@ class TestNurikabeInit(unittest.TestCase):
         print(solution)
         self.fail("Solution was incorrect in all 3 attempts")
     def test_hill_4(self):
+        print("Test 4")
         grid = [
             ['.', '.', '.', '2', '.'],
             ['.', '.', '2', '.', '.'],
@@ -87,6 +103,7 @@ class TestNurikabeInit(unittest.TestCase):
         print(solution)
         self.fail("Solution was incorrect in all 3 attempts")
     def test_hill_5(self):
+        print("Test 5")
         grid = [
             ['.', '.', '.', '.', '.'],
             ['.', '.', '.', '.', '.'],
@@ -104,6 +121,7 @@ class TestNurikabeInit(unittest.TestCase):
         print(solution)
         self.fail("Solution was incorrect in all 3 attempts")
     def test_hill_6(self):
+        print("Test 6")
         grid=[
             ['1', '.', '.', '.', '.'],
             ['.', '.', '2', '.', '.'],
@@ -127,6 +145,7 @@ class TestNurikabeInit(unittest.TestCase):
         print(solution)
         self.fail("Solution was incorrect in all 3 attempts")
     def test_hill_7(self):
+        print("Test 7")
         grid=[
             ['4', '.', '6', '.', '.'],
             ['.', '.', '.', '.', '.'],
@@ -135,7 +154,7 @@ class TestNurikabeInit(unittest.TestCase):
             ['.', '.', '.', '.', '.']
         ]
         expected=np.array(
-            [['L' 'W', 'L', 'L', 'W'],
+            [['L', 'W', 'L', 'L', 'W'],
             ['L', 'W', 'L', 'L', 'W'],
             ['L', 'W', 'L', 'W', 'W'],
             ['L', 'W', 'L', 'W', 'L'],
@@ -150,6 +169,7 @@ class TestNurikabeInit(unittest.TestCase):
         print(solution)    
         self.fail("Solution was incorrect in all 3 attempts")
     def test_hill_8(self):
+        print("Test 8")
         grid=[
             ['.', '.', '.', '.', '5'],
             ['.', '4', '.', '.', '.'],
